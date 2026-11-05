@@ -10,15 +10,17 @@ public class Intake {
 
     public final DcMotor intakeLeft;
     public final DcMotor intakeRight;
-    //Intake motor direction is relative to the control hub
+    //intake motor direction is relative to the control hub
     private final double INTAKE_POWER = 1;
     private final double OUTAKE_POWER = -1;
 
     public enum State{
+        OFF,
         INTAKE,
         OUTAKE
     }
 
+    private State state = State.OFF;
 
 
 
@@ -29,6 +31,15 @@ public class Intake {
     }
 
 
+    public Command intake(){
+        return instant(() -> state = State.INTAKE);
+    }
 
+    public Command outake(){
+        return instant(() -> state = State.OUTAKE);
+    }
 
+    public Command off(){
+        return instant(() -> state = State.OFF);
+    }
 }
