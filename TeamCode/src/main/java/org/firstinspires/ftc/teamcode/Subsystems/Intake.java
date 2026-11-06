@@ -8,9 +8,9 @@ import static com.pedropathing.ivy.commands.Commands.*;
 
 public class Intake {
 
-    public final DcMotor intakeLeft;
-    public final DcMotor intakeRight;
-    //intake motor direction is relative to the control hub
+    public final DcMotor intakeB;
+    public final DcMotor intakeR;
+
     private final double INTAKE_POWER = 1;
     private final double OUTAKE_POWER = -1;
 
@@ -26,8 +26,8 @@ public class Intake {
 
 
     public Intake(Robot robot){
-        intakeLeft = robot.hardwareMap.get(DcMotor.class,"intakeLeft");
-        intakeRight = robot.hardwareMap.get(DcMotor.class,"intakeRight");
+        intakeB = robot.hardwareMap.get(DcMotor.class,"intakeB");
+        intakeR = robot.hardwareMap.get(DcMotor.class,"intakeR");
     }
 
 
