@@ -52,14 +52,24 @@ public class Intake {
             switch (state){
                 case OFF:
                     if(stateChanged){
-                        
+                        stateChanged = false;
+                        off().schedule();
                     }
+                    break;
+                case INTAKE:
+                    if(stateChanged){
+                        stateChanged = false;
+                        intake().schedule();
+                    }
+                    break;
+                case OUTAKE:
+                    if(stateChanged){
+                        stateChanged = false;
+                        outake().schedule();
+                    }
+                    break;
+
             }
-
-
-
-
-
 
         });
 
