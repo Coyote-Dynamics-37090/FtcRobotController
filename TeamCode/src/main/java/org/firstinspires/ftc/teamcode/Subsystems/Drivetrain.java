@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 import static com.pedropathing.ivy.commands.Commands.infinite;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.ivy.Command;
+import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -21,9 +23,14 @@ public class Drivetrain {
     public final Follower follower;
     public final Gamepad gamepad;
 
+    public double x, y, rx, ry = 0;
+
+    private Pose currentPose = new Pose(0,0,0);
+
     double Kp = 1.5;
     double Kd = 0;
     //coefficients for absolute heading control
+
 
 
     private enum DriveState{
@@ -31,6 +38,11 @@ public class Drivetrain {
         HOLD,
         FOLLOW;
     }
+
+
+    private DriveState driveState = DriveState.HOLD;
+
+
     public Drivetrain(Robot robot, Gamepad gamepad){
 
         this.gamepad = gamepad;
@@ -50,19 +62,10 @@ public class Drivetrain {
         //motor behavior
     }
 
+
     public void fieldCentric(){
 
         double turnPower=0;
-
-        double x = gamepad.left_stick_y;
-        double y = gamepad.left_stick_x;
-        //field centric
-
-        double rx = gamepad.right_stick_x;  //strafe
-        double ry = gamepad.right_stick_y;  //forward
-        //absolute heading
-
-
 
         double currentHeading = follower.pose().heading();
 
@@ -82,8 +85,6 @@ public class Drivetrain {
         }
 
 
-
-
         double rotx = x * Math.cos(-currentHeading) - y * Math.sin(-currentHeading);
         double roty = x * Math.sin(-currentHeading) + y * Math.cos(-currentHeading);
 
@@ -92,7 +93,7 @@ public class Drivetrain {
         double denominator = Math.max(Math.abs(roty) + Math.abs(rotx) + Math.abs(rx), 1);
         //normalize motor power
 
-        
+
         double frontLeftPower = (roty + rotx + turnPower) / denominator;
         double backLeftPower = (roty - rotx + turnPower) / denominator;
         double frontRightPower = (roty - rotx - turnPower) / denominator;
@@ -104,7 +105,74 @@ public class Drivetrain {
         backRight.setPower(backRightPower);
     }
 
+    public void setDriveState(DriveState state){
+        driveState = state;
+    }
+
+
+    public Pose getPose() {
+        return follower.pose();
+    }
+
+    public void setPose(Pose pose) {
+        follower.setPose(pose);
+    }
+
+
+    public void updateJoysticks(){
+        x = gamepad.left_stick_y;
+        y = gamepad.left_stick_x;
+        //field centric
+
+        rx = gamepad.right_stick_x;
+        ry = gamepad.right_stick_y;
+        //absolute heading
+    }
+
+    public Command periodic(){
+        return infinite(() -> {
+
+            boolean joysticksActive = (Math.abs(y) > 0.05 || Math.abs(x) > 0.05 || Math.abs(rx) > 0.05 || Math.abs(ry) > 0.05);
+
+            follower.update();
+
+            currentPose = follower.pose();
+
+
+            switch(driveState){
+                case HOLD:
+                    if(joysticksActive){
+                        follower.stop();
+                        setDriveState(DriveState.MANUAL);
+                    }
+                    break;
+
+                case MANUAL:
+                    fieldCentric();
+                    if(!joysticksActive){
+                        follower.hold(currentPose);
+                        setDriveState(DriveState.HOLD);
+                    }
+                    break;
+                case FOLLOW:
+
+                    if(!follower.isBusy()){
+                        follower.hold(currentPose);
+                        setDriveState(DriveState.HOLD);
+                    }
+
+                    if(joysticksActive){
+                        follower.stop();
+                        setDriveState(DriveState.MANUAL);
+                    }
+                    break;
+            }
+
+
+        });
 
 
 
+
+    }
 }
