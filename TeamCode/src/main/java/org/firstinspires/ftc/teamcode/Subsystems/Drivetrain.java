@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.robot.Robot;
+import org.firstinspires.ftc.teamcode.util.Alliance;
 
 public class Drivetrain {
 
@@ -64,6 +65,7 @@ public class Drivetrain {
 
 
     public void fieldCentric(){
+        updateJoysticks();
 
         double turnPower=0;
 
@@ -111,7 +113,7 @@ public class Drivetrain {
 
 
     public Pose getPose() {
-        return follower.pose();
+        return currentPose;
     }
 
     public void setPose(Pose pose) {
@@ -129,6 +131,17 @@ public class Drivetrain {
         //absolute heading
     }
 
+/*
+    public void followLeft(){
+
+
+        if(Alliance.Alliance == Alliance.alliance.BLUE){
+            follower.follow();
+        } else {
+
+        }
+    }
+*/
     public Command periodic(){
         return infinite(() -> {
 
@@ -160,11 +173,13 @@ public class Drivetrain {
                         follower.hold(currentPose);
                         setDriveState(DriveState.HOLD);
                     }
+                    //check if path is finished
 
                     if(joysticksActive){
                         follower.stop();
                         setDriveState(DriveState.MANUAL);
                     }
+                    //check for joystick interference
                     break;
             }
 
