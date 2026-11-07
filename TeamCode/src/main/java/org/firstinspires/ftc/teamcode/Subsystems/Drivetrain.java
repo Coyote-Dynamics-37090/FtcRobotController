@@ -142,6 +142,13 @@ public class Drivetrain {
         }
     }
 */
+
+    public void init(){
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
     public Command periodic(){
         return infinite(() -> {
 
