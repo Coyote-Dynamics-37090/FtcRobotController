@@ -23,6 +23,7 @@ public class Intake {
 
     private State state = State.OFF;
 
+    //TODO: add switcher and make flat when normal intaking, one side when intake is running
 
 
 
@@ -45,6 +46,11 @@ public class Intake {
     public Command off(){
         stateChanged = true;
         return instant(() -> state = State.OFF);
+    }
+
+    public void init(){
+        intakeB.setPower(0);
+        intakeR.setPower(0);
     }
 
     public Command periodic(){
