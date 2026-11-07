@@ -42,17 +42,27 @@ public class Main_Tele extends LinearOpMode {
                 robot.shooter.flywheelset();
                 yes = false;
             }
-            if(gamepad1.aWasPressed()){
+
+
+            if(gamepad1.bWasPressed()){
                 robot.intake.intakeIn().schedule();
-            } else if(gamepad1.bWasPressed()){
+            }
+            if(gamepad1.bWasReleased()){
                 robot.intake.intakeOff().schedule();
             }
 
 
-            if(gamepad1.dpadLeftWasPressed()){
-                robot.intake.intakeRSide();
-            } else if(gamepad1.dpadRightWasPressed()){
-                robot.intake.intakeBSide();
+
+            if(gamepad1.rightBumperWasPressed()){
+                robot.intake.shootIn().schedule();
+            }
+            if(gamepad1.rightBumperWasReleased()){
+                robot.intake.intakeOff().schedule();
+            }
+
+
+            if(gamepad1.dpadDownWasPressed()){
+                robot.drivetrain.reHeading();
             }
 
             Scheduler.execute();

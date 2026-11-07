@@ -79,8 +79,8 @@ public class Shooter {
     }
 
     public void flywheelset(){
-        shooterRed.setVelocity(500);
-        shooterBlack.setVelocity(500);
+        shooterRed.setVelocity(1200);
+        shooterBlack.setVelocity(1200);
     }
 
     public Command periodic(){

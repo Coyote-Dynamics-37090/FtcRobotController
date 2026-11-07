@@ -1,14 +1,18 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import static com.pedropathing.ivy.commands.Commands.infinite;
+import static com.pedropathing.ivy.commands.Commands.instant;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.math.Pose;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.util.Alliance;
@@ -20,12 +24,14 @@ public class Drivetrain {
     public final DcMotorEx frontRight;
     public final DcMotorEx backLeft;
     public final DcMotorEx backRight;
-    public final Follower follower;
+
+    IMU imu;
+   // public final Follower follower;
     public final Gamepad gamepad;
 
     public double x, y, rx, ry = 0;
 
-    private Pose currentPose = new Pose(0,0,0);
+    private double currentPose = 0;
 
     double Kp = 1.5;
     double Kd = 0;
@@ -48,7 +54,17 @@ public class Drivetrain {
         this.gamepad = gamepad;
         //pass in gamepad from robot
 
-        follower = Constants.create(robot.hardwareMap);
+       // follower = Constants.create(robot.hardwareMap);
+
+        imu = robot.hardwareMap.get(IMU.class,"imu");
+
+        RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP
+        );
+
+        IMU.Parameters parameters = new IMU.Parameters(orientation);
+        imu.initialize(parameters);
 
         frontLeft = robot.hardwareMap.get(DcMotorEx.class,"frontLeft");
         frontRight = robot.hardwareMap.get(DcMotorEx.class,"frontRight");
@@ -68,7 +84,8 @@ public class Drivetrain {
 
         double turnPower=0;
 
-        double currentHeading = follower.pose().heading();
+        double currentHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        //follower.pose().heading();
 
         if (Math.hypot(rx, ry) > 0.2) {
 
@@ -91,14 +108,14 @@ public class Drivetrain {
 
         rotx = rotx * 1.1;
 
-        double denominator = Math.max(Math.abs(roty) + Math.abs(rotx) + Math.abs(turnPower), 1);
+        double denominator = Math.max(Math.abs(roty) + Math.abs(rotx) + Math.abs(rx), 1);
         //normalize motor power
 
 
-        double frontLeftPower = (roty + rotx + turnPower) / denominator;
-        double backLeftPower = (roty - rotx + turnPower) / denominator;
-        double frontRightPower = (roty - rotx - turnPower) / denominator;
-        double backRightPower = (roty + rotx - turnPower) / denominator;
+        double frontLeftPower = (roty + rotx + rx) / denominator;
+        double backLeftPower = (roty - rotx + rx) / denominator;
+        double frontRightPower = (roty - rotx - rx) / denominator;
+        double backRightPower = (roty + rotx - rx) / denominator;
 
         frontLeft.setPower(frontLeftPower);
         backLeft.setPower(backLeftPower);
@@ -112,24 +129,29 @@ public class Drivetrain {
 
 
     public Pose getPose() {
-        return currentPose;
+        //return currentPose;
+        return null;
     }
 
     public void setPose(Pose pose) {
-        follower.setPose(pose);
+       // follower.setPose(pose);
     }
 
 
     public void updateJoysticks(){
-        x = -gamepad.left_stick_y;
-        y = -gamepad.left_stick_x;
+        rx = -gamepad.right_stick_y;
+       //ry = -gamepad.left_stick_x;
         //field centric
 
-        rx = gamepad.right_stick_x;
-        ry = -gamepad.right_stick_y;
+        x = -gamepad.left_stick_y;
+        y = -gamepad.left_stick_x;
         //absolute heading
     }
 
+
+    public void reHeading(){
+        imu.resetYaw();
+    }
 /*
     public void followLeft(){
 
@@ -148,21 +170,23 @@ public class Drivetrain {
         backLeft.setPower(0);
         backRight.setPower(0);
     }
+
+
     public Command periodic(){
         return infinite(() -> {
 
             updateJoysticks();
             boolean joysticksActive = (Math.abs(y) > 0.05 || Math.abs(x) > 0.05 || Math.abs(rx) > 0.05 || Math.abs(ry) > 0.05);
 
-            follower.update();
+            //follower.update();
 
-            currentPose = follower.pose();
+            currentPose = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
 
             switch(driveState){
                 case HOLD:
                     if(joysticksActive){
-                        follower.stop();
+                       // follower.stop();
                         setDriveState(DriveState.MANUAL);
                     }
                     break;
@@ -176,18 +200,19 @@ public class Drivetrain {
                     break;
                 case FOLLOW:
 
-                    if(!follower.isBusy()){
-                        follower.hold(currentPose);
-                        setDriveState(DriveState.HOLD);
-                    }
+                  //  if(!follower.isBusy()){
+                  //      follower.hold(currentPose);
+                  //      setDriveState(DriveState.HOLD);
+                 //   }
                     //check if path is finished
 
                     if(joysticksActive){
-                        follower.stop();
+                       // follower.stop();
                         setDriveState(DriveState.MANUAL);
                     }
                     //check for joystick interference
                     break;
+                default: setDriveState(DriveState.MANUAL);
             }
 
 
