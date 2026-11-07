@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 import static com.pedropathing.ivy.commands.Commands.infinite;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -34,14 +33,14 @@ public class Drivetrain {
 
 
 
-    private enum DriveState{
+    public enum DriveState{
         MANUAL,
         HOLD,
-        FOLLOW;
+        FOLLOW
     }
 
 
-    private DriveState driveState = DriveState.HOLD;
+    private DriveState driveState = DriveState.MANUAL;
 
 
     public Drivetrain(Robot robot, Gamepad gamepad){
@@ -52,9 +51,9 @@ public class Drivetrain {
         follower = Constants.create(robot.hardwareMap);
 
         frontLeft = robot.hardwareMap.get(DcMotorEx.class,"frontLeft");
-        frontRight = robot.hardwareMap.get(DcMotorEx.class,"fronLeft");
-        backLeft = robot.hardwareMap.get(DcMotorEx.class,"fronLeft");
-        backRight = robot.hardwareMap.get(DcMotorEx.class,"fronLeft");
+        frontRight = robot.hardwareMap.get(DcMotorEx.class,"frontRight");
+        backLeft = robot.hardwareMap.get(DcMotorEx.class,"backLeft");
+        backRight = robot.hardwareMap.get(DcMotorEx.class,"backRight");
         //hardware init
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -92,7 +91,7 @@ public class Drivetrain {
 
         rotx = rotx * 1.1;
 
-        double denominator = Math.max(Math.abs(roty) + Math.abs(rotx) + Math.abs(rx), 1);
+        double denominator = Math.max(Math.abs(roty) + Math.abs(rotx) + Math.abs(turnPower), 1);
         //normalize motor power
 
 
@@ -122,12 +121,12 @@ public class Drivetrain {
 
 
     public void updateJoysticks(){
-        x = gamepad.left_stick_y;
-        y = gamepad.left_stick_x;
+        x = -gamepad.left_stick_y;
+        y = -gamepad.left_stick_x;
         //field centric
 
         rx = gamepad.right_stick_x;
-        ry = gamepad.right_stick_y;
+        ry = -gamepad.right_stick_y;
         //absolute heading
     }
 
@@ -152,6 +151,7 @@ public class Drivetrain {
     public Command periodic(){
         return infinite(() -> {
 
+            updateJoysticks();
             boolean joysticksActive = (Math.abs(y) > 0.05 || Math.abs(x) > 0.05 || Math.abs(rx) > 0.05 || Math.abs(ry) > 0.05);
 
             follower.update();
@@ -170,8 +170,8 @@ public class Drivetrain {
                 case MANUAL:
                     fieldCentric();
                     if(!joysticksActive){
-                        follower.hold(currentPose);
-                        setDriveState(DriveState.HOLD);
+                      //  follower.hold(currentPose);
+                      //  setDriveState(DriveState.HOLD);
                     }
                     break;
                 case FOLLOW:

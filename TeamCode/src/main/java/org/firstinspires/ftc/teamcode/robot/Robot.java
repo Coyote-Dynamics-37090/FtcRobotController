@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
@@ -11,15 +12,17 @@ public class Robot {
 
     public final HardwareMap hardwareMap;
     public final Gamepad gamepad;
+    public final Telemetry telemetry;
     public Drivetrain drivetrain;
     public Intake intake;
     public Shooter shooter;
 
     //declare subsystems
 
-    public Robot(HardwareMap hardwareMap, Gamepad gamepad){
+    public Robot(HardwareMap hardwareMap, Gamepad gamepad, Telemetry telemetry){
         this.hardwareMap = hardwareMap;
         this.gamepad = gamepad;
+        this.telemetry = telemetry;
 
         // pass in hardware map and gamepad from opmode
         drivetrain = new Drivetrain(this, gamepad);
@@ -38,7 +41,7 @@ public class Robot {
 
     public void periodic(){
         drivetrain.periodic().schedule();
-        intake.periodic().schedule();
+
         shooter.periodic().schedule();
     }
 

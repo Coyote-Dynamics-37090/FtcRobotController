@@ -76,14 +76,17 @@ public class Shooter {
 
     public void init(){
         shooterBlack.setPower(0);
-        shooterRed.setPower(0);
     }
 
+    public void flywheelset(){
+        shooterRed.setVelocity(500);
+        shooterBlack.setVelocity(500);
+    }
 
     public Command periodic(){
         return infinite(() -> {
 
-            updatePID();
+           // updatePID();
         });
 
     }
