@@ -26,7 +26,7 @@ public class Shooter {
     private  double errorTolerance = 10;
     //maximum error tolerance for flywheels
 
-
+ private final double SHOOTING_SPEED = 0;
 
 
     public Shooter(Robot robot){
@@ -35,23 +35,19 @@ public class Shooter {
         //initialize motors
 
         shooterRed.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooterRed.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        //set motor zero power behaviors
+        shooterBlack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        shooterRed.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooterBlack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        //set motor zero power behaviors / modes
     }
 
-    public double getErrorTolerance(){
-        return errorTolerance;
-    }
-    public void setErrorTolerance(double tolerance){
-        errorTolerance = tolerance;
-    }
+    public double getErrorTolerance(){ return errorTolerance; }
+    public void setErrorTolerance(double tolerance){ errorTolerance = tolerance; }
     //getters and setters for error tolerance
-    public double getFlywheelVelocity(){
-        return flywheelVelocity;
-    }
-    public void setFlywheelVelocity(double speed){
-        flywheelVelocity = speed;
-    }
+    public double getFlywheelVelocity(){ return flywheelVelocity; }
+    public void setFlywheelVelocity(double speed){ flywheelVelocity = speed; }
     //flywheel velocity getters/ setters
     public void updateFlywheelVelocity(){
         setFlywheelVelocity(
@@ -60,12 +56,8 @@ public class Shooter {
     }
     //update flywheel velocity as average velocity of both motors
 
-    public double getFlywheelTarget(){
-        return  flywheelTarget;
-    }
-    public void setFlywheelTarget(double target){
-        flywheelTarget = target;
-    }
+    public double getFlywheelTarget(){ return  flywheelTarget; }
+    public void setFlywheelTarget(double target){ flywheelTarget = target; }
     //flywheel target getters/setters
 
     public boolean isUpToSpeed(){
@@ -81,6 +73,11 @@ public class Shooter {
         shooterBlack.setPower(power);
     }
 
+
+    public void init(){
+        shooterBlack.setPower(0);
+        shooterRed.setPower(0);
+    }
 
 
     public Command periodic(){
