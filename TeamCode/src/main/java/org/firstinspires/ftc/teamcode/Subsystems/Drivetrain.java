@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.robot.Robot;
@@ -28,6 +29,7 @@ public class Drivetrain {
     IMU imu;
    // public final Follower follower;
     public final Gamepad gamepad;
+    public final Telemetry telemetry;
 
     public double x, y, rx, ry = 0;
 
@@ -49,10 +51,12 @@ public class Drivetrain {
     private DriveState driveState = DriveState.MANUAL;
 
 
-    public Drivetrain(Robot robot, Gamepad gamepad){
+    public Drivetrain(Robot robot, Gamepad gamepad, Telemetry telemetry){
 
         this.gamepad = gamepad;
         //pass in gamepad from robot
+
+        this.telemetry = telemetry;
 
        // follower = Constants.create(robot.hardwareMap);
 
@@ -79,12 +83,15 @@ public class Drivetrain {
     }
 
 
+    public double getHeading(){
+        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+    }
     public void fieldCentric(){
         updateJoysticks();
 
         double turnPower=0;
 
-        double currentHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double currentHeading = getHeading();
         //follower.pose().heading();
 
         if (Math.hypot(rx, ry) > 0.2) {
@@ -108,7 +115,7 @@ public class Drivetrain {
 
         rotx = rotx * 1.1;
 
-        double denominator = Math.max(Math.abs(roty) + Math.abs(rotx) + Math.abs(rx), 1);
+        double denominator = Math.max(Math.abs(roty) + Math.abs(rotx) + Math.abs(turnPower), 1);
         //normalize motor power
 
 
@@ -139,12 +146,12 @@ public class Drivetrain {
 
 
     public void updateJoysticks(){
-        rx = -gamepad.right_stick_y;
-       //ry = -gamepad.left_stick_x;
+        rx = -gamepad.right_stick_x;
+        ry = -gamepad.right_stick_y;
         //field centric
 
-        x = -gamepad.left_stick_y;
-        y = -gamepad.left_stick_x;
+        x = -gamepad.left_stick_x;
+        y = -gamepad.left_stick_y;
         //absolute heading
     }
 
@@ -172,6 +179,18 @@ public class Drivetrain {
     }
 
 
+    public void telemetry(){
+        telemetry.addData("x", x);
+        telemetry.addData("y",y);
+        telemetry.addData("ry", ry);
+        telemetry.addData("rx",rx);
+        telemetry.addData("heading",getHeading());
+        telemetry.addData("frontL",frontLeft.getPower());
+        telemetry.addData("frontR",frontRight.getPower());
+        telemetry.addData("backL",backLeft.getPower());
+        telemetry.addData("frontL",frontLeft.getPower());
+        telemetry.update();
+    }
     public Command periodic(){
         return infinite(() -> {
 
@@ -180,7 +199,7 @@ public class Drivetrain {
 
             //follower.update();
 
-            currentPose = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
 
 
             switch(driveState){
@@ -217,6 +236,7 @@ public class Drivetrain {
 
 
         });
+
 
 
 
