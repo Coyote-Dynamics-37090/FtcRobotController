@@ -25,7 +25,7 @@ public class Robot {
         this.telemetry = telemetry;
 
         // pass in hardware map and gamepad from opmode
-        drivetrain = new Drivetrain(this, gamepad);
+        drivetrain = new Drivetrain(this, gamepad, telemetry);
         intake = new Intake(this);
         shooter = new Shooter(this);
         //initialize subsystems
