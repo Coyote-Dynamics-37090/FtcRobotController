@@ -38,7 +38,9 @@ public class drivetrain extends LinearOpMode {
         while (opModeIsActive()) {
 
 
-
+            if(gamepad1.dpadDownWasPressed()){
+                robot.drivetrain.reHeading();
+            }
 
             robot.drivetrain.telemetry();
 
