@@ -18,9 +18,9 @@ public class Intake {
     private final double INTAKE_POWER = 1;
     private final double OUTAKE_POWER = -1;
 
-    public double SB = 0;
-    public double SR = 1;
-    public double SM = .5;
+    public double SB = 0.58;
+    public double SR = 0;
+    public double SM = .36;
 
     //TODO: add switcher and make flat when normal intaking, one side when intake is running
 
@@ -40,6 +40,8 @@ public class Intake {
         return instant(() -> intakeB.setPower(0));
     }
 
+
+
     public Command intakeRIn() {
         return instant(() -> intakeR.setPower(INTAKE_POWER));
     }
@@ -50,16 +52,20 @@ public class Intake {
         return instant(() -> intakeR.setPower(0));
     }
 
+
+
     public Command intakeOff() {
-        return parallel(intakeROff());
+        return parallel(intakeROff(), intakeBOff());
+    }
+    public Command intakeIn() {
+        return parallel(intakeRIn(), intakeBOut());
     }
 
-    public Command intakeIn() {
-        return parallel(intakeRIn(), intakeBOut(),switcherRed());
-    }
+
     public Command switcherPos(double pos){
         return instant(() -> ISwitcher.setPosition(pos));
     }
+
 
     public Command switcherBlack(){
         return instant(() -> ISwitcher.setPosition(SB));
@@ -99,6 +105,6 @@ public class Intake {
     public void init(){
         intakeB.setPower(0);
         intakeR.setPower(0);
-       // ISwitcher.setPosition(SM);
+        switcherMid().schedule();
     }
 }
