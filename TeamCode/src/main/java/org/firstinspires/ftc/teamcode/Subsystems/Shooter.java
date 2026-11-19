@@ -86,7 +86,7 @@ public class Shooter {
     public Command periodic(){
         return infinite(() -> {
 
-           // updatePID();
+            updatePID();
         });
 
     }
