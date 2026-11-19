@@ -40,7 +40,7 @@ public class Drivetrain {
 
     private double currentPose = 0;
 
-    public static double Kp = 1.5;
+    public static double Kp = -0.3;
     public static double Kd = 0;
     //coefficients for absolute heading control
     double lastError;
@@ -204,8 +204,8 @@ public class Drivetrain {
         ry = -gamepad.right_stick_y;
         //field centric
 
-        x = gamepad.left_stick_x;
-        y = -gamepad.left_stick_y;
+        x = -gamepad.left_stick_x;
+        y = gamepad.left_stick_y;
         //absolute heading
     }
 
