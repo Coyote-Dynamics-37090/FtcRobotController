@@ -139,7 +139,7 @@ public class Drivetrain {
         if (Math.hypot(rx, ry) > 0.2) {
             //stick deadzone
 
-            targetHeading = Math.atan2(rx, ry);
+            targetHeading = Math.atan2(-rx, ry);
             //calculate stick angle
         }
 
@@ -204,8 +204,8 @@ public class Drivetrain {
         ry = -gamepad.right_stick_y;
         //field centric
 
-        x = -gamepad.left_stick_x;
-        y = gamepad.left_stick_y;
+        x = gamepad.left_stick_x;
+        y = -gamepad.left_stick_y;
         //absolute heading
     }
 
